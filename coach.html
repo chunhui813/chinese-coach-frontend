@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>練習中・語語教練</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --yellow:       #FFD60A;
+      --yellow-light: #FFF9DB;
+      --yellow-dark:  #C9A800;
+      --purple:       #7B2FBE;
+      --purple-light: #F0E5FF;
+      --purple-dark:  #5A1F8C;
+      --green:        #22C55E;
+      --red:          #EF4444;
+      --text:         #1A1A2E;
+      --text-muted:   #888;
+      --bg:           #F8F4FF;
+      --white:        #FFFFFF;
+      --shadow:       0 2px 12px rgba(0,0,0,.08);
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Noto Sans TC', 'PingFang TC', sans-serif;
+      background: var(--bg);
+      overflow: hidden;
+    }
+    body { display: flex; flex-direction: column; }
+    header {
+      background: linear-gradient(135deg, var(--purple) 0%, var(--purple-dark) 100%);
+      color: #fff;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-shrink: 0;
+      box-shadow: 0 2px 16px rgba(90,31,140,.3);
+      z-index: 10;
+    }
+    .hd-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .hd-icon { font-size: 26px; flex-shrink: 0; }
+    .hd-title { font-size: 15px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hd-sub { font-size: 10px; opacity: .75; }
+    .hd-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .timer-box { background: rgba(255,255,255,.18); border-radius: 12px; padding: 5px 12px; text-align: center; min-width: 72px; }
+    .timer-label { font-size: 9px; opacity: .8; }
+    .timer-val { font-size: 20px; font-weight: 900; letter-spacing: 1px; }
+    .timer-box.urgent .timer-val { color: var(--yellow); }
+    .btn-end { background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 8px; padding: 5px 10px; font-size: 12px; font-family: inherit; cursor: pointer; white-space: nowrap; transition: background .15s; }
+    .btn-end:hover { background: rgba(255,255,255,.28); }
+    .progress-bar { height: 3px; background: var(--purple-light); flex-shrink: 0; }
+    .progress-fill { height: 100%; background: var(--yellow); transition: width .5s linear; width: 0%; }
+    .q-strip { background: var(--white); border-bottom: 1px solid #EDE5FF; padding: 8px 14px; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .q-dot { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #D8C8F0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #B0A0C8; transition: all .3s; flex-shrink: 0; }
+    .q-dot.active { border-color: var(--purple); color: var(--purple); background: var(--purple-light); transform: scale(1.1); }
+    .q-dot.done { border-color: var(--green); background: var(--green); color: #fff; font-size: 14px; }
+    .q-status { font-size: 12px; color: var(--text-muted); margin-left: auto; }
+    .chat { flex: 1; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 10px; scroll-behavior: smooth; }
+    .msg { display: flex; gap: 8px; max-width: 88%; animation: fadeUp .25s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .msg.ai   { align-self: flex-start; }
+    .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+    .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; align-self: flex-end; }
+    .msg.ai  .avatar { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); }
+    .msg.user .avatar { background: var(--yellow); }
+    .bubble { padding: 10px 14px; border-radius: 18px; font-size: 14.5px; line-height: 1.65; word-break: break-word; }
+    .msg.ai .bubble { background: var(--white); color: var(--text); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+    .msg.user .bubble { background: linear-gradient(135deg, var(--purple), var(--purple-dark)); color: #fff; border-bottom-right-radius: 4px; }
+    .q-badge { display: inline-block; background: var(--yellow); color: var(--text); font-size: 11px; font-weight: 900; border-radius: 8px; padding: 2px 9px; margin-bottom: 6px; letter-spacing: .3px; }
+    .typing-wrap { display: flex; align-self: flex-start; gap: 8px; max-width: 88%; }
+    .typing-bubble { background: var(--white); border-radius: 18px; border-bottom-left-radius: 4px; padding: 14px 18px; display: flex; gap: 5px; align-items: center; box-shadow: var(--shadow); }
+    .typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--purple); animation: blink 1.1s infinite; }
+    .typing-dot:nth-child(2) { animation-delay: .18s; }
+    .typing-dot:nth-child(3) { animation-delay: .36s; }
+    @keyframes blink { 0%, 100% { opacity: .25; transform: scale(.8); } 50% { opacity: 1; transform: scale(1); } }
+    .input-wrap { background: var(--white); border-top: 1px solid #EDE5FF; padding: 10px 12px; display: flex; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+    textarea { flex: 1; border: 2px solid #DDD0F5; border-radius: 18px; padding: 9px 14px; font-size: 14.5px; font-family: inherit; outline: none; resize: none; max-height: 96px; line-height: 1.5; transition: border-color .2s; background: var(--bg); }
+    textarea:focus  { border-color: var(--purple); }
+    textarea::placeholder { color: #CCC; }
+    .btn-send { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--purple), var(--purple-dark)); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; flex-shrink: 0; transition: transform .18s, opacity .18s; box-shadow: 0 4px 14px rgba(123,47,190,.32); }
+    .btn-send:hover   { transform: scale(1.08); }
+    .btn-send:active  { transform: scale(.96); }
+    .btn-send:disabled { opacity: .45; cursor: default; transform: none; }
+    .toast { position: fixed; top: 14px; left: 50%; transform: translateX(-50%); background: var(--red); color: #fff; padding: 9px 20px; border-radius: 999px; font-size: 13px; font-weight: 500; z-index: 999; display: none; box-shadow: 0 4px 18px rgba(0,0,0,.2); white-space: nowrap; }
+    .overlay { position: fixed; inset: 0; background: rgba(26,26,46,.55); display: none; align-items: center; justify-content: center; z-index: 200; }
+    .overlay-card { background: #fff; border-radius: 24px; padding: 36px 28px; text-align: center; max-width: 300px; width: 90%; animation: popIn .3s ease; }
+    @keyframes popIn { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .overlay-icon { font-size: 56px; display: block; }
+    .overlay-card h2 { font-size: 22px; margin: 14px 0 8px; }
+    .overlay-card p  { color: var(--text-muted); font-size: 13px; }
+    .spinner { margin: 16px auto 0; width: 24px; height: 24px; border: 3px solid #EDE5FF; border-top-color: var(--purple); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sys-msg { text-align: center; font-size: 12px; color: var(--text-muted); background: rgba(123,47,190,.06); border-radius: 10px; padding: 6px 14px; align-self: center; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="hd-left">
+    <span class="hd-icon">🎤</span>
+    <div>
+      <div class="hd-title">語語教練・國語練習</div>
+      <div class="hd-sub">私中備考智能系統</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <div class="timer-box" id="timer-box">
+      <div class="timer-label">剩餘</div>
+      <div class="timer-val" id="timer-val">30:00</div>
+    </div>
+    <button class="btn-end" onclick="confirmEnd()">結束練習</button>
+  </div>
+</header>
+<div class="progress-bar">
+  <div class="progress-fill" id="progress-fill"></div>
+</div>
+<div class="q-strip">
+  <div class="q-dot" id="q1">1</div>
+  <div class="q-dot" id="q2">2</div>
+  <div class="q-dot" id="q3">3</div>
+  <div class="q-dot" id="q4">4</div>
+  <span class="q-status" id="q-status">準備開始...</span>
+</div>
+<div class="chat" id="chat"></div>
+<div class="input-wrap">
+  <textarea id="input" placeholder="輸入你的答案..." rows="1" disabled></textarea>
+  <button class="btn-send" id="btn-send" disabled onclick="handleSend()">➤</button>
+</div>
+<div class="toast" id="toast"></div>
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <span class="overlay-icon">🎉</span>
+    <h2>練習完成！</h2>
+    <p>語語教練正在整理你的學習報告...</p>
+    <div class="spinner"></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="storage.js"></script>
+<script>
+  let messages      = [];
+  let currentQ      = 0;
+  let doneQs        = new Set();
+  let timerSecs     = CONFIG.PRACTICE_DURATION;
+  let timerInterval = null;
+  let busy          = false;
+  let practiceOver  = false;
+
+  function startTimer() {
+    timerInterval = setInterval(() => {
+      timerSecs--;
+      renderTimer();
+      if (timerSecs <= 0) { clearInterval(timerInterval); onTimeout(); }
+    }, 1000);
+  }
+  function renderTimer() {
+    const m = String(Math.floor(timerSecs / 60)).padStart(2, '0');
+    const s = String(timerSecs % 60).padStart(2, '0');
+    document.getElementById('timer-val').textContent = `${m}:${s}`;
+    if (timerSecs <= 300) document.getElementById('timer-box').classList.add('urgent');
+    const elapsed = CONFIG.PRACTICE_DURATION - timerSecs;
+    const pct = Math.min(elapsed / CONFIG.PRACTICE_DURATION * 100, 100);
+    document.getElementById('progress-fill').style.width = pct + '%';
+  }
+  function onTimeout() {
+    if (practiceOver) return;
+    showToast('⏰ 時間到！整理學習報告中...', 4000);
+    requestReport(true);
+  }
+  function confirmEnd() {
+    if (practiceOver) return;
+    if (confirm('確定要結束練習並查看報告嗎？')) { clearInterval(timerInterval); requestReport(true); }
+  }
+  function appendMsg(role, html) {
+    const chat = document.getElementById('chat');
+    const wrap = document.createElement('div');
+    wrap.className = `msg ${role === 'assistant' ? 'ai' : 'user'}`;
+    const av = document.createElement('div');
+    av.className = 'avatar';
+    av.textContent = role === 'assistant' ? '🎤' : '😊';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = html;
+    wrap.appendChild(av);
+    wrap.appendChild(bubble);
+    chat.appendChild(wrap);
+    chat.scrollTop = chat.scrollHeight;
+    return wrap;
+  }
+  function appendSysMsg(text) {
+    const chat = document.getElementById('chat');
+    const el = document.createElement('div');
+    el.className = 'sys-msg';
+    el.textContent = text;
+    chat.appendChild(el);
+    chat.scrollTop = chat.scrollHeight;
+  }
+  function showTyping() {
+    const chat = document.getElementById('chat');
+    const wrap = document.createElement('div');
+    wrap.className = 'typing-wrap';
+    wrap.id = 'typing';
+    wrap.innerHTML = `
+      <div class="avatar" style="background:linear-gradient(135deg,var(--purple),var(--purple-dark));font-size:17px">🎤</div>
+      <div class="typing-bubble">
+        <div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>
+      </div>`;
+    chat.appendChild(wrap);
+    chat.scrollTop = chat.scrollHeight;
+  }
+  function hideTyping() {
+    const el = document.getElementById('typing');
+    if (el) el.remove();
+  }
+  function showToast(msg, duration = 3200) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.style.display = 'block';
+    setTimeout(() => { t.style.display = 'none'; }, duration);
+  }
+  function setInput(enabled) {
+    document.getElementById('input').disabled    = !enabled;
+    document.getElementById('btn-send').disabled = !enabled;
+    if (enabled) document.getElementById('input').focus();
+  }
+  function formatAI(raw) {
+    let text = raw;
+    text = text.replace(/\[REPORT_START\][\s\S]*?\[REPORT_END\]/g,
+      '<em style="color:#999;font-size:13px">✅ 報告已生成，即將跳轉...</em>');
+    text = text.replace(/\[Q([1-4])\]/g, (_, n) =>
+      `<div><span class="q-badge">第 ${n} 題</span></div>`);
+    text = text.replace(/\n/g, '<br>');
+    return text;
+  }
+  function processQMarkers(text) {
+    const found = [...text.matchAll(/\[Q([1-4])\]/g)].map(m => parseInt(m[1]));
+    if (!found.length) return;
+    const newQ = Math.max(...found);
+    for (let i = 1; i < newQ; i++) markDone(i);
+    if (newQ > currentQ) { currentQ = newQ; setActive(newQ); }
+  }
+  function setActive(n) {
+    const el = document.getElementById(`q${n}`);
+    if (!doneQs.has(n)) { el.className = 'q-dot active'; el.textContent = n; }
+    document.getElementById('q-status').textContent = `第 ${n} 題進行中`;
+  }
+  function markDone(n) {
+    if (doneQs.has(n)) return;
+    doneQs.add(n);
+    const el = document.getElementById(`q${n}`);
+    el.className = 'q-dot done';
+    el.textContent = '✓';
+    document.getElementById('q-status').textContent = `完成 ${doneQs.size} / 4 題`;
+  }
+  function markAllDone() {
+    for (let i = 1; i <= 4; i++) markDone(i);
+    document.getElementById('q-status').textContent = '全部完成 🎉';
+  }
+
+  /* ══════════════════════════════════════════
+     ★ 改這裡：改打後端，不直接打 Anthropic
+  ══════════════════════════════════════════ */
+  async function callClaude() {
+    const resp = await fetch(CONFIG.BACKEND_URL + '/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model:      CONFIG.MODEL,
+        max_tokens: CONFIG.MAX_TOKENS,
+        system:     CONFIG.SYSTEM_PROMPT,
+        messages:   messages
+      })
+    });
+    if (!resp.ok) {
+      let errMsg = `API 錯誤 ${resp.status}`;
+      try {
+        const errData = await resp.json();
+        errMsg = errData.error || errMsg;
+      } catch {}
+      throw new Error(errMsg);
+    }
+    const data = await resp.json();
+    return data.content[0].text;
+  }
+
+  async function handleSend() {
+    if (busy || practiceOver) return;
+    const input = document.getElementById('input');
+    const text  = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    input.style.height = 'auto';
+    setInput(false);
+    busy = true;
+    messages.push({ role: 'user', content: text });
+    appendMsg('user', escapeHtml(text).replace(/\n/g, '<br>'));
+    showTyping();
+    try {
+      const reply = await callClaude();
+      hideTyping();
+      messages.push({ role: 'assistant', content: reply });
+      appendMsg('assistant', formatAI(reply));
+      processQMarkers(reply);
+      if (reply.includes('[REPORT_START]')) { await handleReport(reply); }
+      else { setInput(true); }
+    } catch (err) {
+      hideTyping();
+      showToast('❌ ' + err.message, 5000);
+      setInput(true);
+    }
+    busy = false;
+  }
+  async function requestReport(isForced = false) {
+    if (practiceOver) return;
+    practiceOver = true;
+    setInput(false);
+    busy = true;
+    const prompt = isForced
+      ? '練習時間結束，請根據已完成的題目立刻生成學習報告（即使4題沒全完成也要出報告）。'
+      : '所有題目已完成，請立刻生成學習報告。';
+    messages.push({ role: 'user', content: prompt });
+    showTyping();
+    try {
+      const reply = await callClaude();
+      hideTyping();
+      messages.push({ role: 'assistant', content: reply });
+      appendMsg('assistant', formatAI(reply));
+      await handleReport(reply);
+    } catch (err) {
+      hideTyping();
+      showToast('❌ 無法生成報告：' + err.message, 6000);
+    }
+    busy = false;
+  }
+  async function handleReport(text) {
+    practiceOver = true;
+    clearInterval(timerInterval);
+    markAllDone();
+    const match = text.match(/\[REPORT_START\]([\s\S]*?)\[REPORT_END\]/);
+    if (!match) { showToast('⚠️ 找不到報告格式，請重試', 5000); return; }
+    let jsonStr = match[1].trim();
+    jsonStr = jsonStr.replace(/,(\s*[}\]])/g, '$1');
+    try {
+      const reportData = JSON.parse(jsonStr);
+      Storage.saveReport({ ...reportData, timestamp: Date.now() });
+      document.getElementById('overlay').style.display = 'flex';
+      setTimeout(() => { window.location.href = 'report.html'; }, 2600);
+    } catch (e) {
+      console.error('Report JSON parse error:', e, jsonStr);
+      showToast('⚠️ 報告解析失敗，請截圖後回首頁重試', 6000);
+    }
+  }
+  async function startPractice() {
+    setInput(false);
+    busy = true;
+    showTyping();
+    messages.push({ role: 'user', content: '嗨！我準備好開始今天的國語練習了，請直接出第一題！' });
+    try {
+      const reply = await callClaude();
+      hideTyping();
+      messages.push({ role: 'assistant', content: reply });
+      appendMsg('assistant', formatAI(reply));
+      processQMarkers(reply);
+      setInput(true);
+      startTimer();
+    } catch (err) {
+      hideTyping();
+      showToast('❌ 無法連接 AI：' + err.message, 6000);
+      appendSysMsg('⚠️ 請確認後端服務是否正常運作');
+    }
+    busy = false;
+  }
+  const inputEl = document.getElementById('input');
+  inputEl.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 96) + 'px';
+  });
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  });
+  function escapeHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  startPractice();
+</script>
+</body>
+</html>

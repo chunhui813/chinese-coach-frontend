@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>語語教練・國語練習</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --yellow:       #FFD60A;
+      --yellow-light: #FFF9DB;
+      --yellow-dark:  #C9A800;
+      --purple:       #7B2FBE;
+      --purple-light: #F0E5FF;
+      --purple-dark:  #5A1F8C;
+      --text:         #1A1A2E;
+      --text-muted:   #777;
+      --bg:           #FFFBF0;
+      --white:        #FFFFFF;
+      --radius:       20px;
+      --shadow:       0 6px 28px rgba(123,47,190,.14);
+    }
+
+    body {
+      font-family: 'Noto Sans TC', 'PingFang TC', sans-serif;
+      background: var(--bg);
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* ── Hero ── */
+    .hero-emoji {
+      font-size: 72px;
+      line-height: 1;
+      margin-bottom: 12px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-12px); }
+    }
+
+    h1 {
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1.25;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--purple);
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    /* ── Coach badge ── */
+    .coach-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+      color: #fff;
+      border-radius: 999px;
+      padding: 6px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    /* ── Kpop hint ── */
+    .kpop-hint {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--yellow-light);
+      border: 1.5px solid var(--yellow-dark);
+      border-radius: 999px;
+      padding: 7px 16px;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 28px;
+    }
+
+    /* ── Last practice card ── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      text-align: left;
+    }
+
+    .card-empty {
+      border: 2px dashed #DDD;
+      box-shadow: none;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    .card-empty p + p { margin-top: 6px; font-size: 13px; }
+
+    .card-header {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 12px;
+    }
+
+    .card-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .card-item { flex: 1; }
+
+    .card-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 3px;
+    }
+
+    .card-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .score-chip {
+      display: inline-block;
+      background: var(--yellow);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 2px 12px;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    /* ── CTA button ── */
+    .btn-start {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      background: linear-gradient(135deg, var(--purple), var(--purple-dark));
+      color: #fff;
+      text-decoration: none;
+      border-radius: var(--radius);
+      padding: 20px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: .5px;
+      box-shadow: 0 8px 28px rgba(123,47,190,.36);
+      transition: transform .18s, box-shadow .18s;
+      margin-bottom: 14px;
+    }
+    .btn-start:hover  { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(123,47,190,.46); }
+    .btn-start:active { transform: translateY(0); }
+
+    .btn-arrow {
+      font-size: 24px;
+      transition: transform .18s;
+    }
+    .btn-start:hover .btn-arrow { transform: translateX(4px); }
+
+    .footer-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="hero-emoji">🎤</span>
+    <h1>今天要練國語了！</h1>
+    <p class="subtitle">私立國中備考・智能訓練系統</p>
+
+    <div class="coach-badge">🎤 語語教練 陪你練習</div>
+
+    <div class="kpop-hint">
+      ✨ 今天的題目可能會出現 (G)I-DLE 喔！
+    </div>
+
+    <div id="last-card" class="card card-empty">
+      <p>📚 還沒有練習記錄</p>
+      <p>第一次挑戰，加油！Soyeon 為你加油！</p>
+    </div>
+
+    <a href="coach.html" class="btn-start">
+      <span>🚀 開始練習</span>
+      <span class="btn-arrow">→</span>
+    </a>
+
+    <p class="footer-hint">每次練習 4 題・30 分鐘倒數計時</p>
+  </div>
+
+  <script src="storage.js"></script>
+  <script>
+    (function () {
+      const last = Storage.getLastReport();
+      if (!last) return;
+
+      const d = new Date(last.timestamp);
+      const dateStr = `${d.getMonth() + 1}月${d.getDate()}日`;
+
+      const card = document.getElementById('last-card');
+      card.className = 'card';
+      card.style.borderLeft = '4px solid var(--purple)';
+      card.innerHTML = `
+        <div class="card-header">上次練習記錄</div>
+        <div class="card-row">
+          <div class="card-item">
+            <div class="card-label">練習日期</div>
+            <div class="card-value">${dateStr}</div>
+          </div>
+          <div class="card-item">
+            <div class="card-label">得分</div>
+            <div class="card-value">
+              <span class="score-chip">${last.score ?? '–'} 分</span>
+            </div>
+          </div>
+        </div>
+      `;
+    })();
+  </script>
+</body>
+</html>
