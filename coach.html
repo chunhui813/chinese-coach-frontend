@@ -348,6 +348,12 @@
     try {
       const reportData = JSON.parse(jsonStr);
       Storage.saveReport({ ...reportData, timestamp: Date.now() });
+      // 自動傳報告到後端存入 Google Sheet
+      fetch(CONFIG.BACKEND_URL + '/api/save-report', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reportData)
+      }).catch(e => console.warn('Sheet 寫入失敗:', e));
       document.getElementById('overlay').style.display = 'flex';
       setTimeout(() => { window.location.href = 'report.html'; }, 2600);
     } catch (e) {
